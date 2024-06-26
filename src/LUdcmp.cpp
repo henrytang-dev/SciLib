@@ -11,6 +11,8 @@ scilib::LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
 
     VecDoub vv(n); // implicit scaling of each row
     d = 1.0; // no row interchanges yet
+
+    // Compute scaling factors
     for (i = 0; i < n; i++) {
         big = 0.0;
         for (j = 0; j < n; j++) {
@@ -22,37 +24,41 @@ scilib::LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
             throw runtime_error("Cannot perform LU decomposition on singular matrix");
         }
         vv[i] = 1.0 / big;
+    }
 
-        // kij perm. for cache efficiency
-        for (k = 0; k < n; k++) {
-            big = 0.0; // to store largest element (pivot)
-            for (i = k; i < n; i++) {
-                temp = vv[i] * abs(lu[i][k]);
-                if (temp > big) {
-                    big = temp;
-                    imax = i;
-                }
+    // Main decomposition loop
+    for (k = 0; k < n; k++) {
+        big = 0.0; // to store largest element (pivot)
+        for (i = k; i < n; i++) {
+            temp = vv[i] * abs(lu[i][k]);
+            if (temp > big) {
+                big = temp;
+                imax = i;
             }
-            if (k != imax) {
-                for (j = 0; j < n; j++) {
-                    temp = lu[imax][j];
-                    lu[imax][j] = lu[k][j];
-                    lu[k][j] = temp;
-                }
-                d = -d;
-                vv[imax] = vv[k];
-            }
-            indx[k] = imax;
-            if (lu[k][k] == 0.0) {
-                lu[k][k] = TINY;
-            }
-            for (i = k + 1; i < n; i++) {
-                temp = lu[i][k] /= lu[k][k];
-                for (j = k + 1; j < n; j++) {
-                    lu[i][j] -= temp * lu[k][j];
-                }
-            }
+        }
 
+        // Pivoting
+        if (k != imax) {
+            for (j = 0; j < n; j++) {
+                temp = lu[imax][j];
+                lu[imax][j] = lu[k][j];
+                lu[k][j] = temp;
+            }
+            d = -d; // Adjust the sign of the determinant
+            vv[imax] = vv[k];
+        }
+        indx[k] = imax;
+
+        if (lu[k][k] == 0.0) {
+            lu[k][k] = TINY; // Prevent division by zero
+        }
+
+        // Elimination
+        for (i = k + 1; i < n; i++) {
+            temp = lu[i][k] /= lu[k][k]; // Normalize the current element in L
+            for (j = k + 1; j < n; j++) {
+                lu[i][j] -= temp * lu[k][j]; // Update the remaining elements in U
+            }
         }
     }
 }
