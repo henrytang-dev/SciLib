@@ -15,7 +15,7 @@ namespace scilib{
         void solve(MatDoub_I &b, MatDoub_O &x); // solve multiple right-hand sides
         void inverse(MatDoub_O &ainv); // inverse of matrix
         Doub det(); // determinate
-
+        void mprove(VecDoub_I &b, VecDoub_IO &x);
         MatDoub_I& aref;
     };
 
@@ -32,7 +32,7 @@ namespace scilib{
         }
 
         void solve(VecDoub_I &b, VecDoub_O &x, Doub thresh);
-        void solve(VecDoub_I &b, MatDoub_O &x, Doub thresh);
+        void solve(MatDoub_I &b, MatDoub_O &x, Doub thresh);
 
         Int rank(Doub thresh);
         Int nullity(Doub thresh);
@@ -46,6 +46,18 @@ namespace scilib{
         void decompose();
         void reorder();
         Doub pythag(const Doub a, const Doub b);
+    };
+
+    struct QRdcmp {
+        Int n;
+        MatDoub qt, r;
+        Bool sing;
+        QRdcmp(MatDoub_I& a);
+        void solve(VecDoub_I& b, VecDoub_O& x);
+        void qtmult(VecDoub_I &b, VecDoub_O &x);
+        void rsolve(VecDoub_I &b, VecDoub_O &x);
+        void update(VecDoub_I &u, VecDoub_I &v);
+        void rotate(const Int i, const Doub a, const Doub b);
     };
 }
 

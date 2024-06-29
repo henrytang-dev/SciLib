@@ -132,3 +132,18 @@ Doub scilib::LUdcmp::det() {
     return dd;
 }
 
+void scilib::LUdcmp::mprove(VecDoub_I &b, VecDoub_IO &x) {
+    Int i, j;
+    VecDoub r(n);
+    for (i = 0; i < n; i++) {
+        Ldoub sdp = -b[ i];
+        for (j = 0; j < n; j++) {
+            sdp += (Ldoub) aref[i][j] * (Ldoub)x[j];
+        }
+        r[i] = sdp;
+    }
+    solve(r, r);
+    for (i = 0; i < n; i++) {
+        x[i] -= r[i];
+    }
+}
