@@ -18,18 +18,18 @@ scilib::QRdcmp::QRdcmp(MatDoub_I &a) : n(a.nrows()), qt(n, n), r(a), sing(false)
                 }
                 for (sum = 0.0, i=k; i < n; i++) {
                     sum += SQR(r[i][k]);
-                    sigma = SIGN(sqrt(sum), r[k][k]);
-                    r[k][k] += sigma;
-                    c[k] = sigma * r[k][k];
-                    d[k] = -scale * sigma;
-                    for (j = k + 1; j < n; j++) {
-                        for (sum = 0.0, i = k; i < n; i++) {
-                            sum += r[i][k] * r[i][j];
-                        }
-                        tau = sum / c[k];
-                        for (i = k; i < n; i++) {
-                            r[i][j] -= tau * r[i][k];
-                        }
+                }
+                sigma = SIGN(sqrt(sum), r[k][k]);
+                r[k][k] += sigma;
+                c[k] = sigma * r[k][k];
+                d[k] = -scale * sigma;
+                for (j = k + 1; j < n; j++) {
+                    for (sum = 0.0, i = k; i < n; i++) {
+                        sum += r[i][k] * r[i][j];
+                    }
+                    tau = sum / c[k];
+                    for (i = k; i < n; i++) {
+                        r[i][j] -= tau * r[i][k];
                     }
                 }
             }
@@ -42,8 +42,8 @@ scilib::QRdcmp::QRdcmp(MatDoub_I &a) : n(a.nrows()), qt(n, n), r(a), sing(false)
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             qt[i][j] = 0.0;
-            qt[i][i] = 1.0;
         }
+        qt[i][i] = 1.0;
     }
     for (k = 0; k < n - 1; k++) {
         if (c[k] != 0.0) {
